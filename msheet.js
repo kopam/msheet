@@ -10,8 +10,18 @@ if (Meteor.isClient) {
     render: function(row, col){
       if (row.first && col.first)
         return {i:'*', first: true};
-      else if (row.first)
-        return {i: String.fromCharCode(63+col.i), first:true};
+      else if (row.first){
+        var buildColName = function(char){
+          if (char > 25){
+            var mod = char % 25 - 1;
+            var div = Math.floor(char/25) - 1;
+            return buildColName(div) + String.fromCharCode(65 + mod);
+          }
+          return String.fromCharCode(65 + char);
+        }
+        var code = col.i - 2;
+        return {i: buildColName(code), first:true};
+      }
       else if (col.first)
         return {i: row.i-1, first:true};
       
