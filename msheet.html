@@ -1,0 +1,20 @@
+<head>
+  <title>msheet</title>
+</head>
+
+<body>
+  {{> sheet}}
+</body>
+
+<template name="sheet">
+  <div class='formula' contenteditable='true'>{{currentFormula}}</div>
+  <div class='sheet'>
+  {{#each row}}
+  <div class='row' data-index='{{i}}'>
+    {{#each col}}
+      <div class="cell" data-index='{{i}}' contenteditable="true"></div>
+    {{/each}}
+  </div>
+  {{/each}}
+  </div>
+</template>
