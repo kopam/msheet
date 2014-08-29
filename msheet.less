@@ -1,0 +1,43 @@
+@cellHeight: 20px;
+@cellWidth: 40px;
+@baseBorderColor: gray;
+@baseBorder: 1px solid @baseBorderColor;
+
+body {
+  margin: 8px;
+  min-width: (@cellWidth + 1) * 32 - 1 + 8;
+}
+
+.formula {
+  //minus one from the l border -\
+  //times ------------------\    |
+  //border left -------\    |    |
+  //cells ---\         |    |    |
+  width: (@cellWidth + 1) * 32 - 1;
+  height: @cellHeight;
+  border: @baseBorder;
+  margin: 12px 0 12px 0;
+}
+
+.row {
+  float:left;
+  
+  &:first-child{
+    border-top: @baseBorder;  
+  }
+}
+
+.cell {
+  float:left;
+  width: @cellWidth;
+  height: @cellHeight;
+  border-right: @baseBorder;
+  border-bottom: @baseBorder;
+  overflow: hidden;
+  
+  &:first-child{
+    border-left: @baseBorder;
+  }
+}
+
+
