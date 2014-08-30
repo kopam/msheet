@@ -12,9 +12,9 @@
   <div class='formula' contenteditable='true'>{{currentFormula}}</div>
   <div class='sheet'>
   {{#each row}}
-    <div class='row' data-index='{{i}}'>
-      {{#each col}}
-        {{#with render .. . }}
+    <div class='row'>
+      {{#each col .}}
+        {{#with render . }}
           {{> cell }}
         {{/with}}
       {{/each}}
@@ -25,8 +25,8 @@
 
 <template name="cell">
   {{#if first}}
-    <div class="header" data-index='{{i}}'>{{i}}</div>
+    <div class="header">{{val}}</div>
   {{else}}
-    <div class="cell" data-index='{{i}}' contenteditable="true"></div>
+    <input class="cell" value="{{val}}" />
   {{/if}}
 </template>
