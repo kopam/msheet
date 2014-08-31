@@ -9,7 +9,7 @@
 </body>
 
 <template name="sheet">
-  <div class='formula' contenteditable='true'>{{currentFormula}}</div>
+  <input class='formula'/>
   <div class='sheet'>
   {{#each row}}
     <div class='row'>
@@ -27,6 +27,6 @@
   {{#if first}}
     <div class="header">{{val}}</div>
   {{else}}
-    <input class="cell" value="{{val}}" />
+    <input class="cell" data-row="{{row}}" data-col="{{col}}" value="{{val}}" />
   {{/if}}
 </template>

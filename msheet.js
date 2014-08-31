@@ -8,40 +8,48 @@ if (Meteor.isClient) {
 //      return Session.get('currentCell').val;
     },
     render: function(cell){
-      if (cell.row === 1 && cell.col === 1)
+      if (cell.row === 0 && cell.col === 0)
         return {val:'*', first: true};
-      else if (cell.row === 1){
+      else if (cell.row === 0){
         var buildColName = function(char){
           if (char > 25){
             var mod = char % 25 - 1;
-            var div = Math.floor(char/25) - 1;
+            var div = Math.floor(char/25) - 1 ;
             return buildColName(div) + String.fromCharCode(65 + mod);
           }
           return String.fromCharCode(65 + char);
         };
-        var code = cell.col - 2;
+        var code = cell.col - 1;
         return {val: buildColName(code), first:true};
       }
-      else if (cell.col === 1)
-        return {val: cell.row-1, first:true};
+      else if (cell.col === 0)
+        return {val: cell.row, first:true};
       
       return cell;
     },
     row: function(){
-      return _.map(_.range(1, rows+1),function(i){
+      return _.map(_.range(0, rows+1),function(i){
         return {row: i};
       });
     },
     col: function(row){
-      return Cells.find({row: row.row});
+      if (row.row === 0){
+        return _.map(_.range(0, cols+1), function(i){
+          return {row: 0, col:i};
+        });
+      }
+      var res = Cells.find({row: row.row}, {sort: ["col"]}).fetch();
+      
+      res.unshift({row:row.row, col:0});
+      return res;
     }
   });
   
   Template.sheet.events({
-    'keyup .cell': function(e){
+    'keydown .cell': function(e){
       var ct = e.currentTarget;
-      var col = this.col;
-      var row = this.row;
+      var col = this.col*1 + 1;
+      var row = this.row*1 + 1;
       if (e.which === 13){//[enter] move down a row
         row += e.shiftKey?-1:1;
         ct.value = ct.value.trim();
@@ -53,15 +61,30 @@ if (Meteor.isClient) {
       if (e.which === 13 || e.which === 9){
         document.querySelector('.row:nth-child('+row+') .cell:nth-child('+col+')').focus();
         e.preventDefault();
+        return false;
       }
       if (e.which === 27){
         ct.blur();
       }
     },
     'focus .cell':function(e){
+      var f = document.querySelector('.formula');
+      f.dataset.row = this.row;
+      f.dataset.col = this.col;
       if (this.expr){
         e.currentTarget.value = this.expr;
+        f.value = this.expr;
+      } else {
+        f.value = this.val;
       }
+    },
+    'keydown .formula':function(e){
+      var row = e.currentTarget.dataset['row'];
+      var col = e.currentTarget.dataset['col'];
+      document.querySelector('.row:nth-child('+row+') .cell:nth-child('+col+')').value = e.currentTarget.value;
+    },
+    'blur .formula':function(e){
+      document.querySelector('.row:nth-child('+row+') .cell:nth-child('+col+')').blur();
     },
     'blur .cell':function(e){
       var expression = e.currentTarget.value;

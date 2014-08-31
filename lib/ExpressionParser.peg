@@ -1,0 +1,80 @@
+{
+  function extractList(list, index) {
+    console.log(list)
+    var result = new Array(list.length), i;
+
+    for (i = 0; i < list.length; i++) {
+      result[i] = list[i][index];
+    }
+
+    return result;
+  }
+
+  function buildList(first, rest, index) {
+    return [first].concat(extractList(rest, index));
+  }
+}
+
+start
+  = additive
+
+WhiteSpace "whitespace"
+  = "\t"
+  / "\v"
+  / "\f"
+  / " "
+  / "\u00A0"
+  / "\uFEFF"
+__
+  = (WhiteSpace)*
+
+additive
+  = left:multiplicative "+" right:additive { return left + right; }
+  / multiplicative
+
+multiplicative
+  = left:primary "*" right:multiplicative { return left * right; }
+  / primary
+
+primary
+  = integer
+  / reference
+  / "(" additive:additive ")" { return additive; }
+  / FunctionExpression
+
+integer "integer"
+  = digits:[0-9]+ { return parseInt(digits.join(""), 10); }
+
+reference "reference"
+  = ref:([A-Za-z]+[0-9]+) { 
+      var colArr = ref[0];
+      var col = colArr[0].toUpperCase().charCodeAt(0) - 65 + 1;
+      for (var i = 1; i < colArr.length; i++){
+        var c = colArr[i];
+        col += (c.toUpperCase().charCodeAt(0) - 65 + 1);
+      };
+      var row = ref[1]*1;
+      var cell = Cells.find({row:row, col:col}).fetch()[0];
+      return parseInt(cell.val, 10);
+   }
+
+FunctionExpression
+  = id:(Identifier __ ) ("(" __ params:(FormalParameterList __)? ")" __) {
+      return {type:"paramList", "functionName": id[0], args: params[0]};
+    }
+  / id:(Identifier __ ) ("(" __ params:(RangeParameterList __)? ")" __) {
+      return {type:"rangeExp", "functionName": id[0], args: params[0]};
+    }
+
+FormalParameterList
+  = first:Identifier rest:(__ "," __ Identifier)* {
+      return buildList(first, rest, 3);
+    }
+
+RangeParameterList
+  = start:Identifier __ ":" __ end:Identifier {
+      return [start, end];
+    }
+
+Identifier
+  = id:[A-Za-z0-9]+ { return id.join(""); }
